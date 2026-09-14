@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>Ne Zaman Emekli Olurum? — SGK Emeklilik Hesaplama</title>
+<style>
+  :root{
+    --slate-50:#f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0; --slate-300:#cbd5e1;
+    --slate-400:#94a3b8; --slate-500:#64748b; --slate-600:#475569; --slate-700:#334155; --slate-800:#1e293b;
+    --indigo-100:#e0e7ff; --indigo-400:#818cf8; --indigo-500:#6366f1; --indigo-600:#4f46e5;
+    --emerald-50:#ecfdf5; --emerald-100:#d1fae5; --emerald-500:#10b981; --emerald-600:#059669;
+    --amber-100:#fef3c7; --amber-600:#d97706; --red-50:#fef2f2; --red-500:#ef4444;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:0 0 3rem; min-height:100vh; background:var(--slate-50);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,sans-serif;
+    color:var(--slate-800); -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:440px; margin:0 auto; padding:1.5rem 1rem 0;}
+  header h1{font-size:1.3rem; font-weight:800; margin:0; color:var(--slate-800);}
+  header p{font-size:0.875rem; color:var(--slate-500); margin:0.25rem 0 0;}
+  header{margin-bottom:1.25rem;}
+
+  .card{background:#fff; border:1px solid var(--slate-200); border-radius:1rem; box-shadow:0 1px 2px rgba(0,0,0,.04); padding:1.25rem;}
+  .field{margin-bottom:1rem;}
+  .field label{display:block; font-size:0.875rem; font-weight:600; color:var(--slate-700); margin-bottom:0.4rem;}
+  .field .hint{font-size:0.75rem; color:var(--slate-400); margin-top:0.3rem;}
+  input[type="date"], input[type="number"]{
+    width:100%; padding:0.65rem 0.85rem; border-radius:0.75rem; border:1px solid var(--slate-200);
+    background:#fff; color:var(--slate-800); font-size:0.9rem; font-family:inherit;
+  }
+  input[type="date"]:focus, input[type="number"]:focus{outline:none; border-color:var(--indigo-400); box-shadow:0 0 0 3px rgba(129,140,248,.25);}
+
+  .gender-grid{display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;}
+  .gender-btn{
+    padding:0.65rem; border-radius:0.75rem; font-size:0.875rem; font-weight:600; text-align:center;
+    border:1px solid var(--slate-200); background:#fff; color:var(--slate-600); cursor:pointer;
+  }
+  .gender-btn.active{background:var(--indigo-500); border-color:var(--indigo-500); color:#fff;}
+
+  .checkbox-row{display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;}
+  .checkbox-row input{width:1rem; height:1rem;}
+  .checkbox-row label{font-size:0.875rem; color:var(--slate-600);}
+
+  .toggle{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:0.75rem;
+    padding:0.75rem 1rem; border-radius:0.75rem; border:1px solid var(--slate-200); background:#fff; cursor:pointer;
+  }
+  .toggle .txt{text-align:left;}
+  .toggle .txt .t1{display:block; font-size:0.875rem; font-weight:600; color:var(--slate-700);}
+  .toggle .txt .t2{display:block; font-size:0.75rem; color:var(--slate-400); margin-top:0.1rem;}
+  .switch{position:relative; width:2.75rem; height:1.5rem; border-radius:999px; background:var(--slate-300); flex-shrink:0; transition:background .15s;}
+  .switch.on{background:var(--emerald-500);}
+  .switch .knob{position:absolute; top:2px; left:2px; width:1.25rem; height:1.25rem; border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.2); transition:transform .15s;}
+  .switch.on .knob{transform:translateX(1.25rem);}
+
+  .error-box{margin-top:1rem; font-size:0.875rem; font-weight:500; color:var(--red-500); background:var(--red-50); border-radius:0.75rem; padding:0.65rem 0.85rem;}
+
+  .submit-btn{
+    margin-top:1.25rem; width:100%; padding:0.85rem; border-radius:0.75rem; border:none;
+    background:var(--indigo-500); color:#fff; font-size:0.9rem; font-weight:700; cursor:pointer;
+  }
+  .submit-btn:active{background:var(--indigo-600);}
+
+  .result-wrap{margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem; animation:fadeIn .35s ease both;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+  .result-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;}
+  .result-header .label{font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--indigo-600);}
+  .result-header .gender{font-size:0.7rem; font-weight:500; color:var(--slate-400);}
+
+  .section-title{font-size:0.875rem; font-weight:600; color:var(--slate-500); margin:0.75rem 0 0.25rem;}
+
+  .cond-row{display:flex; align-items:center; justify-content:space-between; padding:0.7rem 0; border-bottom:1px solid var(--slate-100);}
+  .cond-row:last-child{border-bottom:none;}
+  .cond-left{display:flex; align-items:center; gap:0.75rem;}
+  .cond-badge{display:flex; align-items:center; justify-content:center; width:1.75rem; height:1.75rem; border-radius:999px; font-size:0.75rem; font-weight:700; flex-shrink:0;}
+  .cond-badge.done{background:var(--emerald-100); color:var(--emerald-600);}
+  .cond-badge.pending{background:var(--amber-100); color:var(--amber-600);}
+  .cond-title{font-size:0.875rem; font-weight:600; color:var(--slate-700); margin:0;}
+  .cond-sub{font-size:0.75rem; color:var(--slate-400); margin:0.1rem 0 0;}
+  .cond-right{font-size:0.875rem; font-weight:700; color:var(--slate-700); text-align:right;}
+  .cond-right.done{color:var(--emerald-600);}
+  .cond-note{font-size:0.75rem; color:var(--slate-400); padding-top:0.5rem;}
+
+  .final-card{background:linear-gradient(135deg,var(--emerald-500),var(--emerald-600)); border-radius:1rem; padding:1.25rem; color:#fff;}
+  .final-card .label{font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:#d1fae5;}
+  .final-card .date{font-size:1.9rem; font-weight:800; margin:0.2rem 0 0;}
+  .final-card .msg{font-size:0.875rem; color:#ecfdf5; margin-top:0.5rem; line-height:1.5;}
+
+  .sim-card{background:#fff; border:2px solid var(--indigo-100); border-radius:1rem; padding:1.25rem;}
+  .sim-card .top{display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;}
+  .sim-card .top .label{font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--indigo-600);}
+  .sim-card .tag{font-size:0.625rem; font-weight:700; background:var(--indigo-100); color:var(--indigo-600); padding:0.15rem 0.5rem; border-radius:999px;}
+  .sim-card .date{font-size:1.5rem; font-weight:800; color:var(--indigo-600); margin:0;}
+  .sim-card .meta{font-size:0.75rem; color:var(--slate-500); margin:0.2rem 0 0;}
+  .diff-badge{margin-top:0.75rem; display:inline-flex; align-items:center; gap:0.4rem; padding:0.35rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:700;}
+  .diff-badge.better{background:var(--emerald-50); color:var(--emerald-600);}
+  .diff-badge.worse{background:var(--slate-100); color:var(--slate-500);}
+  .sim-disclaimer{font-size:0.7rem; color:var(--slate-400); margin-top:0.75rem; line-height:1.5;}
+
+  .footer-note{font-size:0.7rem; color:var(--slate-400); text-align:center; margin-top:2rem; line-height:1.6; padding:0 0.5rem;}
+
+  .credit{
+    margin-top:1.75rem; padding-top:1.25rem; border-top:1px solid var(--slate-200);
+    text-align:center; font-size:0.8rem; color:var(--slate-400);
+  }
+  .credit a{
+    color:var(--indigo-600); font-weight:700; text-decoration:none;
+  }
+  .credit a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Ne Zaman Emekli Olurum?</h1>
+    <p>SGK mevzuatına dayalı emeklilik tarihi hesaplama</p>
+  </header>
+
+  <form class="card" id="calc-form">
+    <div class="field">
+      <label>Cinsiyet</label>
+      <div class="gender-grid">
+        <div class="gender-btn active" data-gender="kadin">Kadın</div>
+        <div class="gender-btn" data-gender="erkek">Erkek</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Doğum Tarihi</label>
+      <input type="date" id="birthDate" required />
+    </div>
+
+    <div class="field">
+      <label>Hizmete Başlama Tarihi</label>
+      <input type="date" id="startDate" required />
+      <p class="hint">İlk uzun vadeli sigorta prim tarihiniz</p>
+    </div>
+
+    <div class="field">
+      <label>Mevcut SSK (4A) Prim Gün Sayısı</label>
+      <input type="number" id="sskDays" min="0" inputmode="numeric" placeholder="Örn: 4500" required />
+    </div>
+
+    <div class="field">
+      <label>Diğer Sandıklara Ait Gün Sayısı</label>
+      <input type="number" id="otherDays" min="0" inputmode="numeric" value="0" />
+      <p class="hint">Bağ-Kur, Emekli Sandığı, banka sandığı vb. (opsiyonel)</p>
+    </div>
+
+    <div class="field">
+      <label>Askerlik Borçlanması Gün Sayısı</label>
+      <input type="number" id="militaryDays" min="0" inputmode="numeric" value="0" />
+      <p class="hint">Opsiyonel, borçlanmadıysanız 0 bırakın</p>
+    </div>
+
+    <div class="checkbox-row" id="militaryBeforeRow" style="display:none;">
+      <input type="checkbox" id="militaryBeforeStart" />
+      <label for="militaryBeforeStart">Askerlik, hizmete başlamadan önce mi yapıldı?</label>
+    </div>
+
+    <div class="field">
+      <label>Fiili Hizmet Zammı (Yıpranma Payı)</label>
+      <input type="number" id="fiiliDays" min="0" inputmode="numeric" value="0" />
+      <p class="hint">Gün cinsinden, opsiyonel</p>
+    </div>
+
+    <div class="field" style="margin-bottom:0.25rem;">
+      <div class="toggle" id="kademeliToggle">
+        <span class="txt">
+          <span class="t1">Kademeli Emeklilik Simülasyonu</span>
+          <span class="t2">1999–2008 arası girişliler için taslak tablo (resmi değil)</span>
+        </span>
+        <span class="switch" id="kademeliSwitch"><span class="knob"></span></span>
+      </div>
+    </div>
+
+    <div id="error-box"></div>
+
+    <button type="submit" class="submit-btn">Hesapla</button>
+  </form>
+
+  <div id="result-container"></div>
+
+  <p class="footer-note">
+    Bu araç bilgilendirme amaçlıdır, SGK'nın resmi bir hizmeti değildir. Kesin sonuç için SGK'nın "Ne Zaman Emekli Olurum?" hizmetini veya hizmet dökümünüzü esas alınız.
+  </p>
+
+  <p class="credit">
+    Hazırlayan: <a href="https://x.com/kurtayfun" target="_blank" rel="noopener noreferrer">@kurtayfun — Bankacı Anlatıyor</a>
+  </p>
+</div>
+
+<script>
+/* =====================================================================
+   TARİH YARDIMCI FONKSİYONLARI
+===================================================================== */
+function D(y, m, day) { return new Date(Date.UTC(y, m - 1, day)); }
+function cloneDate(date) { return new Date(date.getTime()); }
+function addYears(date, n) { const nd = cloneDate(date); nd.setUTCFullYear(nd.getUTCFullYear() + n); return nd; }
+function addMonths(date, n) { const nd = cloneDate(date); nd.setUTCMonth(nd.getUTCMonth() + n); return nd; }
+function addDays(date, n) { const nd = cloneDate(date); nd.setUTCDate(nd.getUTCDate() + n); return nd; }
+
+function addSgkDays(date, totalDays) {
+  const sign = totalDays < 0 ? -1 : 1;
+  const abs = Math.abs(Math.round(totalDays));
+  const years = Math.floor(abs / 360);
+  const rem = abs % 360;
+  const months = Math.floor(rem / 30);
+  const days = rem % 30;
+  let nd = addYears(date, sign * years);
+  nd = addMonths(nd, sign * months);
+  nd = addDays(nd, sign * days);
+  return nd;
+}
+function isBeforeOrEqual(a, b) { return a.getTime() <= b.getTime(); }
+function maxDate() { const arr = Array.prototype.slice.call(arguments).filter(Boolean); return new Date(Math.max.apply(null, arr.map(x => x.getTime()))); }
+function sameDay(a, b) { return a && b && a.getTime() === b.getTime(); }
+function formatDate(date) {
+  if (!date) return '—';
+  const dd = String(date.getUTCDate()).padStart(2, '0');
+  const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+  return dd + '.' + mm + '.' + date.getUTCFullYear();
+}
+function parseInputDate(str) {
+  if (!str) return null;
+  const parts = str.split('-').map(Number);
+  const y = parts[0], m = parts[1], day = parts[2];
+  if (!y || !m || !day) return null;
+  return D(y, m, day);
+}
+function yearsBetween(a, b) {
+  if (!a || !b || a.getTime() > b.getTime()) return 0;
+  let years = b.getUTCFullYear() - a.getUTCFullYear();
+  const anniv = addYears(a, years);
+  if (anniv.getTime() > b.getTime()) years -= 1;
+  return Math.max(0, years);
+}
+function todayUTC() {
+  const t = new Date();
+  return D(t.getFullYear(), t.getMonth() + 1, t.getDate());
+}
+function escapeHtml(s){ return String(s); }
+
+/* =====================================================================
+   MEVZUAT TABLOLARI
+===================================================================== */
+const EYT_KADIN_TABLE = [
+  { end: D(1981, 4, 1), days: 5000 }, { end: D(1981, 9, 8), days: 5000 },
+  { end: D(1984, 5, 23), days: 5000 }, { end: D(1985, 5, 23), days: 5000 },
+  { end: D(1986, 5, 23), days: 5075 }, { end: D(1987, 5, 23), days: 5150 },
+  { end: D(1988, 5, 23), days: 5225 }, { end: D(1989, 5, 23), days: 5300 },
+  { end: D(1990, 5, 23), days: 5375 }, { end: D(1991, 5, 23), days: 5450 },
+  { end: D(1992, 5, 23), days: 5525 }, { end: D(1993, 5, 23), days: 5600 },
+  { end: D(1994, 5, 23), days: 5675 }, { end: D(1995, 5, 23), days: 5750 },
+  { end: D(1996, 5, 23), days: 5825 }, { end: D(1997, 5, 23), days: 5900 },
+  { end: D(1998, 5, 23), days: 5975 }, { end: D(1999, 5, 23), days: 5975 },
+  { end: D(1999, 9, 8), days: 5975 },
+];
+const EYT_ERKEK_TABLE = [
+  { end: D(1976, 9, 9), days: 5000 }, { end: D(1979, 5, 23), days: 5000 },
+  { end: D(1980, 11, 23), days: 5000 }, { end: D(1982, 5, 23), days: 5075 },
+  { end: D(1983, 11, 23), days: 5150 }, { end: D(1985, 5, 23), days: 5225 },
+  { end: D(1986, 11, 23), days: 5300 }, { end: D(1988, 5, 23), days: 5375 },
+  { end: D(1989, 11, 23), days: 5450 }, { end: D(1991, 5, 23), days: 5525 },
+  { end: D(1992, 11, 23), days: 5600 }, { end: D(1994, 5, 23), days: 5675 },
+  { end: D(1995, 11, 23), days: 5750 }, { end: D(1997, 5, 23), days: 5825 },
+  { end: D(1998, 11, 23), days: 5900 }, { end: D(1999, 9, 8), days: 5975 },
+];
+function getEytPrimDays(gender, effStart) {
+  const table = gender === 'kadin' ? EYT_KADIN_TABLE : EYT_ERKEK_TABLE;
+  for (const row of table) if (isBeforeOrEqual(effStart, row.end)) return row.days;
+  return table[table.length - 1].days;
+}
+
+const KADEMELI_SIM_TABLE = [
+  { start: D(1999, 9, 9), end: D(2000, 12, 31), yasK: 43, yasE: 45, gun: 6400 },
+  { start: D(2001, 1, 1), end: D(2001, 12, 31), yasK: 44, yasE: 46, gun: 6475 },
+  { start: D(2002, 1, 1), end: D(2002, 12, 31), yasK: 45, yasE: 47, gun: 6550 },
+  { start: D(2003, 1, 1), end: D(2003, 12, 31), yasK: 46, yasE: 48, gun: 6625 },
+  { start: D(2004, 1, 1), end: D(2004, 12, 31), yasK: 47, yasE: 49, gun: 6700 },
+  { start: D(2005, 1, 1), end: D(2005, 12, 31), yasK: 48, yasE: 50, gun: 6775 },
+  { start: D(2006, 1, 1), end: D(2006, 12, 31), yasK: 49, yasE: 51, gun: 6850 },
+  { start: D(2007, 1, 1), end: D(2007, 12, 31), yasK: 50, yasE: 52, gun: 6925 },
+  { start: D(2008, 1, 1), end: D(2008, 4, 30), yasK: 51, yasE: 53, gun: 7000 },
+];
+function getKademeliSim(effStart) {
+  for (const row of KADEMELI_SIM_TABLE) {
+    if (effStart.getTime() >= row.start.getTime() && effStart.getTime() <= row.end.getTime()) return row;
+  }
+  return null;
+}
+
+const DONEM3_AGE_TABLE = [
+  { end: D(2035, 12, 31), kadin: 58, erkek: 60 },
+  { end: D(2037, 12, 31), kadin: 59, erkek: 61 },
+  { end: D(2039, 12, 31), kadin: 60, erkek: 62 },
+  { end: D(2041, 12, 31), kadin: 61, erkek: 63 },
+  { end: D(2043, 12, 31), kadin: 62, erkek: 64 },
+  { end: D(2045, 12, 31), kadin: 63, erkek: 65 },
+  { end: D(2047, 12, 31), kadin: 64, erkek: 65 },
+  { end: null, kadin: 65, erkek: 65 },
+];
+function getDonem3Age(gender, tamamlanmaTarihi) {
+  for (const row of DONEM3_AGE_TABLE) {
+    if (row.end === null || isBeforeOrEqual(tamamlanmaTarihi, row.end)) return gender === 'kadin' ? row.kadin : row.erkek;
+  }
+  return 65;
+}
+
+/* =====================================================================
+   HESAPLAMA MOTORU
+===================================================================== */
+function calculateRetirement(inputs) {
+  const gender = inputs.gender, birthDate = inputs.birthDate, startDate = inputs.startDate;
+  const sskDays = inputs.sskDays, otherDays = inputs.otherDays, militaryDays = inputs.militaryDays;
+  const militaryBeforeStart = inputs.militaryBeforeStart, fiiliDays = inputs.fiiliDays, kademeliSimOn = inputs.kademeliSimOn;
+
+  const totalPrim = sskDays + otherDays + militaryDays + fiiliDays;
+  const today = todayUTC();
+
+  let effStart = startDate;
+  if (militaryBeforeStart && militaryDays > 0) effStart = addSgkDays(startDate, -militaryDays);
+
+  const eighteenDate = addYears(birthDate, 18);
+  const sigortalilikBaslangic = maxDate(effStart, eighteenDate);
+
+  const D1_END = D(1999, 9, 8);
+  const D2_END = D(2008, 4, 30);
+  let donem = isBeforeOrEqual(effStart, D1_END) ? 1 : (isBeforeOrEqual(effStart, D2_END) ? 2 : 3);
+
+  const base = {
+    donem: donem, effStart: effStart, totalPrim: totalPrim, sigortalilikBaslangic: sigortalilikBaslangic,
+    eighteenDate: eighteenDate, currentAge: yearsBetween(birthDate, today), currentYil: yearsBetween(sigortalilikBaslangic, today)
+  };
+
+  if (donem === 1) {
+    const gerekliPrim = getEytPrimDays(gender, effStart);
+    const gerekliYil = gender === 'kadin' ? 20 : 25;
+    const primKalan = Math.max(0, gerekliPrim - totalPrim);
+    const primTarihi = addSgkDays(today, primKalan);
+    const sureTarihi = addYears(sigortalilikBaslangic, gerekliYil);
+    const nihaiTarih = maxDate(primTarihi, sureTarihi);
+    return Object.assign({}, base, {
+      label: 'EYT Kapsamı (506 S.K. Geçici 81. Madde)',
+      gerekliPrim: gerekliPrim, gerekliYil: gerekliYil, gerekliYas: 0, yasSartiYok: true,
+      primTarihi: primTarihi, sureTarihi: sureTarihi, yasTarihi: null,
+      nihaiTarih: nihaiTarih
+    });
+  }
+
+  if (donem === 2) {
+    const gerekliPrim = 7000;
+    const gerekliYil = 25;
+    const gerekliYas = gender === 'kadin' ? 58 : 60;
+    const primKalan = Math.max(0, gerekliPrim - totalPrim);
+    const primTarihi = addSgkDays(today, primKalan);
+    const sureTarihi = addYears(sigortalilikBaslangic, gerekliYil);
+    const yasTarihi = addYears(birthDate, gerekliYas);
+    const nihaiTarih = maxDate(primTarihi, sureTarihi, yasTarihi);
+
+    const result = Object.assign({}, base, {
+      label: 'Yürürlükteki Mevzuat (09.09.1999–30.04.2008 Girişli)',
+      gerekliPrim: gerekliPrim, gerekliYil: gerekliYil, gerekliYas: gerekliYas,
+      primTarihi: primTarihi, sureTarihi: sureTarihi, yasTarihi: yasTarihi,
+      nihaiTarih: nihaiTarih
+    });
+
+    if (kademeliSimOn) {
+      const sim = getKademeliSim(effStart);
+      if (sim) {
+        const simYas = gender === 'kadin' ? sim.yasK : sim.yasE;
+        const simPrimKalan = Math.max(0, sim.gun - totalPrim);
+        const simPrimTarihi = addSgkDays(today, simPrimKalan);
+        const simYasTarihi = addYears(birthDate, simYas);
+        const simNihaiTarih = maxDate(simPrimTarihi, sureTarihi, simYasTarihi);
+        result.kademeliSim = { yas: simYas, gun: sim.gun, primTarihi: simPrimTarihi, yasTarihi: simYasTarihi, sureTarihi: sureTarihi, nihaiTarih: simNihaiTarih };
+      }
+    }
+    return result;
+  }
+
+  const gerekliPrim = 7200;
+  const primKalan = Math.max(0, gerekliPrim - totalPrim);
+  const primTamamlanmaTarihi = addSgkDays(today, primKalan);
+  const gerekliYas = getDonem3Age(gender, primTamamlanmaTarihi);
+  const yasTarihi = addYears(birthDate, gerekliYas);
+  const nihaiTarih = maxDate(primTamamlanmaTarihi, yasTarihi);
+
+  return Object.assign({}, base, {
+    label: '5510 Sayılı Kanun (01.05.2008 Sonrası Girişli)',
+    gerekliPrim: gerekliPrim, gerekliYas: gerekliYas, gerekliYil: null,
+    primTarihi: primTamamlanmaTarihi, yasTarihi: yasTarihi, sureTarihi: null,
+    nihaiTarih: nihaiTarih, ayriSureSartiYok: true
+  });
+}
+
+function getGecikenFaktor(r) {
+  const nihai = r.nihaiTarih;
+  const parts = [];
+  if (r.primTarihi && sameDay(r.primTarihi, nihai)) parts.push('prim gün sayısı');
+  if (r.sureTarihi && sameDay(r.sureTarihi, nihai)) parts.push('sigortalılık süresi');
+  if (r.yasTarihi && sameDay(r.yasTarihi, nihai)) parts.push('yaş');
+  const today = todayUTC();
+  if (sameDay(nihai, today) && parts.length === 0) return 'Tüm şartları sağlıyorsunuz — bugün itibarıyla emekliliğe hak kazanmış durumdasınız.';
+  if (parts.length === 0) return null;
+  if (parts.length === 1) return 'Emekliliğinizi geciktiren ana faktör: ' + parts[0] + ' şartı.';
+  return 'Emekliliğinizi geciktiren faktörler: ' + parts.join(' ve ') + ' şartları eş zamanlı tamamlanıyor.';
+}
+
+/* =====================================================================
+   RENDER
+===================================================================== */
+function condRow(title, current, required, unit, targetDate, done) {
+  return '' +
+    '<div class="cond-row">' +
+      '<div class="cond-left">' +
+        '<span class="cond-badge ' + (done ? 'done' : 'pending') + '">' + (done ? '✓' : '⏳') + '</span>' +
+        '<div><p class="cond-title">' + title + '</p><p class="cond-sub">' + current + ' / ' + required + ' ' + unit + '</p></div>' +
+      '</div>' +
+      '<div class="cond-right ' + (done ? 'done' : '') + '">' + (done ? 'Tamamlandı' : formatDate(targetDate)) + '</div>' +
+    '</div>';
+}
+
+function renderResult(result, gender) {
+  const genderLabel = gender === 'kadin' ? 'Kadın' : 'Erkek';
+  const gecikenMesaj = getGecikenFaktor(result);
+
+  let html = '<div class="result-wrap">';
+
+  html += '<div class="card">';
+  html += '<div class="result-header"><span class="label">' + result.label + '</span><span class="gender">' + genderLabel + '</span></div>';
+  html += '<p class="section-title">Mevcut Durum</p>';
+  html += condRow('Prim Gün Sayısı', result.totalPrim.toLocaleString('tr-TR'), result.gerekliPrim.toLocaleString('tr-TR'), 'gün', result.primTarihi, result.totalPrim >= result.gerekliPrim);
+
+  if (!result.ayriSureSartiYok) {
+    html += condRow('Sigortalılık Süresi', result.currentYil, result.gerekliYil, 'yıl', result.sureTarihi, result.currentYil >= result.gerekliYil);
+  }
+
+  if (result.yasSartiYok) {
+    html += '<div class="cond-row"><div class="cond-left"><span class="cond-badge done">✓</span><p class="cond-title">Yaş Şartı: EYT kapsamında yaş şartı aranmaz</p></div></div>';
+  } else {
+    html += condRow('Yaş', result.currentAge, result.gerekliYas, 'yaş', result.yasTarihi, result.currentAge >= result.gerekliYas);
+  }
+
+  if (result.ayriSureSartiYok) {
+    html += '<p class="cond-note">Bilgi: 5510 sayılı Kanun\'da 4/a (SSK) sigortalıları için ayrı bir sigortalılık süresi şartı aranmaz; şu an için sigortalılık süreniz ' + result.currentYil + ' yıldır.</p>';
+  }
+  html += '</div>';
+
+  html += '<div class="final-card">';
+  html += '<p class="label">Nihai Emeklilik Tarihi</p>';
+  html += '<p class="date">' + formatDate(result.nihaiTarih) + '</p>';
+  if (gecikenMesaj) html += '<p class="msg">' + gecikenMesaj + '</p>';
+  html += '</div>';
+
+  if (result.kademeliSim) {
+    const sim = result.kademeliSim;
+    html += '<div class="sim-card">';
+    html += '<div class="top"><span class="label">Olası Kademeli Emeklilik (Taslak)</span><span class="tag">RESMİ DEĞİL</span></div>';
+    html += '<p class="date">' + formatDate(sim.nihaiTarih) + '</p>';
+    html += '<p class="meta">Yaş: ' + sim.yas + ' · Prim: ' + sim.gun.toLocaleString('tr-TR') + ' gün</p>';
+
+    const diffDays = Math.round((result.nihaiTarih.getTime() - sim.nihaiTarih.getTime()) / 86400000);
+    if (diffDays === 0) {
+      html += '<p class="cond-note">Mevcut mevzuata göre fark yok.</p>';
+    } else {
+      const years = Math.floor(Math.abs(diffDays) / 365);
+      const months = Math.round((Math.abs(diffDays) % 365) / 30);
+      const better = diffDays > 0;
+      let diffText = '';
+      if (years > 0) diffText += years + ' yıl ';
+      if (months > 0) diffText += months + ' ay ';
+      diffText += better ? 'daha erken' : 'daha geç';
+      html += '<div class="diff-badge ' + (better ? 'better' : 'worse') + '">' + (better ? '↓' : '↑') + ' Mevcut şartlara göre ' + diffText + '</div>';
+    }
+    html += '<p class="sim-disclaimer">Bu tablo, kamuoyunda tartışılan ve henüz yasalaşmamış bir taslak modele dayanmaktadır; SGK\'nın resmi bir kademeli emeklilik takvimi bulunmamaktadır.</p>';
+    html += '</div>';
+  } else if (result.donem === 2) {
+    html += '<p class="cond-note" style="padding:0 0.25rem;">Not: Kademeli emeklilik simülasyonunu açtıysanız, girdiğiniz hizmete başlama tarihi taslak tablodaki aralıklardan birine denk gelmiyor olabilir.</p>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+/* =====================================================================
+   ETKİLEŞİM
+===================================================================== */
+let gender = 'kadin';
+let kademeliSimOn = false;
+
+document.querySelectorAll('.gender-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.gender-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    gender = btn.getAttribute('data-gender');
+  });
+});
+
+const militaryDaysInput = document.getElementById('militaryDays');
+const militaryBeforeRow = document.getElementById('militaryBeforeRow');
+militaryDaysInput.addEventListener('input', function () {
+  militaryBeforeRow.style.display = Number(militaryDaysInput.value) > 0 ? 'flex' : 'none';
+});
+
+const kademeliToggle = document.getElementById('kademeliToggle');
+const kademeliSwitch = document.getElementById('kademeliSwitch');
+kademeliToggle.addEventListener('click', function () {
+  kademeliSimOn = !kademeliSimOn;
+  kademeliSwitch.classList.toggle('on', kademeliSimOn);
+});
+
+document.getElementById('calc-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const errorBox = document.getElementById('error-box');
+  errorBox.innerHTML = '';
+
+  const birthDate = parseInputDate(document.getElementById('birthDate').value);
+  const startDate = parseInputDate(document.getElementById('startDate').value);
+
+  if (!birthDate || !startDate) {
+    errorBox.innerHTML = '<div class="error-box">Lütfen doğum tarihi ve hizmete başlama tarihini eksiksiz giriniz.</div>';
+    document.getElementById('result-container').innerHTML = '';
+    return;
+  }
+  if (startDate.getTime() < birthDate.getTime()) {
+    errorBox.innerHTML = '<div class="error-box">Hizmete başlama tarihi, doğum tarihinden önce olamaz.</div>';
+    document.getElementById('result-container').innerHTML = '';
+    return;
+  }
+  const ssk = Number(document.getElementById('sskDays').value) || 0;
+  if (ssk <= 0) {
+    errorBox.innerHTML = '<div class="error-box">SSK (4A) prim gün sayısını giriniz.</div>';
+    document.getElementById('result-container').innerHTML = '';
+    return;
+  }
+
+  const inputs = {
+    gender: gender,
+    birthDate: birthDate,
+    startDate: startDate,
+    sskDays: ssk,
+    otherDays: Number(document.getElementById('otherDays').value) || 0,
+    militaryDays: Number(document.getElementById('militaryDays').value) || 0,
+    militaryBeforeStart: document.getElementById('militaryBeforeStart').checked,
+    fiiliDays: Number(document.getElementById('fiiliDays').value) || 0,
+    kademeliSimOn: kademeliSimOn
+  };
+
+  const result = calculateRetirement(inputs);
+  document.getElementById('result-container').innerHTML = renderResult(result, gender);
+});
+</script>
+</body>
+</html>
