@@ -2,7 +2,7 @@
 
 SGK'nın resmi ["Ne Zaman Emekli Olurum?"](https://uyg.sgk.gov.tr/nezaman/) sayfasındaki mantığı temel alan, tek dosyalık, bağımsız (dependency-free) bir emeklilik tarihi hesaplama uygulaması. Herhangi bir kurulum veya build adımı gerektirmez — `sgk-emeklilik-hesaplama.html` dosyasını açmanız yeterlidir.
 
-**Canlı demo:** Bu depoyu GitHub Pages üzerinden yayınladıktan sonra buraya bağlantısını ekleyebilirsiniz.
+**Canlı demo:** kurtayfun.github.io/Ne-zaman-emekli-olurum/
 
 ---
 
