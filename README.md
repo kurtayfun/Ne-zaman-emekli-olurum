@@ -43,4 +43,4 @@ Build adımı yoktur. Depoyu GitHub Pages'te yayınlamak için:
 
 ---
 
-Hazırlayan: [@kurtayfun — Bankacı Anlatıyor](https://x.com/kurtayfun)
+Hazırlayan: [Bankacı Anlatıyor](https://x.com/kurtayfun)
